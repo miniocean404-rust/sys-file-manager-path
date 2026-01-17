@@ -29,10 +29,10 @@
       "i686-pc-windows-msvc",
       "armv7-unknown-linux-gnueabihf",
       "aarch64-linux-android",
+      "armv7-linux-androideabi",
       "x86_64-unknown-freebsd",
       "aarch64-unknown-linux-musl",
-      "aarch64-pc-windows-msvc",
-      "armv7-linux-androideabi"
+      "aarch64-pc-windows-msvc"
     ]
   },
   "publishConfig": {
@@ -43,8 +43,8 @@
     "node": ">= 10.16.0 < 11 || >= 11.8.0 < 12 || >= 12.0.0"
   },
   "scripts": {
-    "build:napi-dev": "tsx build/index.ts",
-    "build:napi": "tsx build/index.ts --release",
+    "build:dev": "tsx build/index.ts",
+    "build": "tsx build/index.ts --release",
     "napi:help": "napi --help",
     "test": "ava",
     "bench": "tsx benchmark/bench.ts"
@@ -53,7 +53,8 @@
     "index.js",
     "index.d.ts",
     "package.json",
-    "LICENSE"
+    "LICENSE",
+    "*.node"
   ],
   "dependencies": {
     "es-toolkit": "1.44.0",

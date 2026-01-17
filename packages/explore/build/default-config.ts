@@ -27,7 +27,7 @@ export const defaultBuildOptions = {
   platform: true,
 
   // 生成的 JS 绑定文件中的包名，仅在使用 `--platform` 标志时有效
-  jsPackageName: "@api/explore",
+  jsPackageName: "@giegie/explore",
 
   // 是否为 TypeScript 绑定生成 const enum
   constEnum: true,
@@ -65,7 +65,7 @@ export const defaultBuildOptions = {
   release: false,
 
   // 详细输出构建命令跟踪信息
-  verbose: true,
+  verbose: false,
 
   // 仅构建指定的二进制文件
   bin: undefined,

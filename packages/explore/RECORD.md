@@ -87,3 +87,36 @@ napi build --release --platform --js-package-name @napi-rs/snappy
 ```
 
 这会将生成的 require 语句从 `require('snappy-darwin-x64')` 改为 `require('@napi-rs/snappy-darwin-x64')`。
+
+## Napi Targets 所有格式
+
+### macOS (Darwin)
+
+- x86_64-apple-darwin
+- aarch64-apple-darwin
+
+### Windows (MSVC)
+
+- x86_64-pc-windows-msvc
+- i686-pc-windows-msvc
+- aarch64-pc-windows-msvc
+
+### Linux (GNU)
+
+- x86_64-unknown-linux-gnu
+- aarch64-unknown-linux-gnu
+- armv7-unknown-linux-gnueabihf
+
+### Linux (MUSL)
+
+- x86_64-unknown-linux-musl
+- aarch64-unknown-linux-musl
+
+### Android
+
+- aarch64-linux-android
+- armv7-linux-androideabi
+
+### FreeBSD
+
+- x86_64-unknown-freebsd
