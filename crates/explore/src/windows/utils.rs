@@ -4,17 +4,18 @@
 use std::ffi::OsString;
 use std::os::windows::ffi::OsStringExt;
 
-use windows::core::PCWSTR;
 use windows::Win32::Foundation::{CloseHandle, HWND, LPARAM};
 use windows::Win32::System::ProcessStatus::GetModuleFileNameExW;
 use windows::Win32::System::Threading::{OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ};
 use windows::Win32::UI::WindowsAndMessaging::{
-    FindWindowW, GetAncestor, GetClassNameW, GetForegroundWindow, GetWindowInfo,
+    FindWindowW, GA_ROOT, GetAncestor, GetClassNameW, GetForegroundWindow, GetWindowInfo,
     GetWindowModuleFileNameW, GetWindowTextLengthW, GetWindowTextW, GetWindowThreadProcessId,
-    GA_ROOT, WINDOWINFO, WS_VISIBLE,
+    WINDOWINFO, WS_VISIBLE,
 };
+use windows::core::PCWSTR;
 
-// 获取前台应用窗口句柄
+// 资源管理器的窗口结构是多层的（顶层窗口 → Shell Browser 窗口 → 内容视图等）
+// 获取前台应用窗口句柄, 返回的是顶层窗口
 pub unsafe fn get_foreground_window() -> HWND {
     unsafe { GetForegroundWindow() }
 }
@@ -77,7 +78,8 @@ pub unsafe fn get_window_title_classname(window: HWND) -> String {
         .to_string()
 }
 
-// 获取窗口标题
+// 资源管理器的窗口结构是多层的（顶层窗口 → Shell Browser 窗口 → 内容视图等）
+// 获取窗口标题, 返回的是 Shell Browser 关联的窗口句柄，可能不是顶层窗口
 pub unsafe fn get_window_title(window: HWND) -> String {
     // 声明一个 u16 数组，存储 256 个字符
     let mut title = [0u16; 512];

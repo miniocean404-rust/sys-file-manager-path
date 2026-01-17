@@ -92,21 +92,19 @@ pub fn get_path_from_explore_view(browser: &IShellBrowser) -> windows::core::Res
 
     unsafe {
         let item = SHCreateItemFromIDList::<IShellItem>(id_list)?;
-        let mut ptr = item.GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING)?;
+        let ptr = item.GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING)?;
 
-        // 将 UTF-16 字符串复制到 'Vec<u16>'（包括 NULL 终止符）
-        let mut path = Vec::new();
-
-        loop {
-            let ch = *ptr.0;
-            if ch == 0 {
-                break;
-            }
-            path.push(ch);
-            ptr.0 = ptr.0.add(1);
+        // 计算 UTF-16 字符串长度（不包含 NULL 终止符）
+        let mut len = 0;
+        while *ptr.0.add(len) != 0 {
+            len += 1;
         }
 
-        // Cleanup
+        // 使用 slice 转换为 Vec<u16>
+        let path = std::slice::from_raw_parts(ptr.0, len).to_vec();
+
+        // 释放内存
+        CoTaskMemFree(Some(ptr.0 as _));
         CoTaskMemFree(Some(id_list as _));
 
         Ok(String::from_utf16_lossy(&path))

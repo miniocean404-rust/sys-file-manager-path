@@ -53,7 +53,7 @@ async function main() {
     ghReleaseName: pkg.version,
 
     // 已存在的 GitHub Release ID
-    ghReleaseId: undefined as string | undefined,
+    ghReleaseId: "",
 
     // 跳过 optionalDependencies 包发布
     skipOptionalPublish: false,

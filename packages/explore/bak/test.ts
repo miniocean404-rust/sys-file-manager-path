@@ -1,12 +1,11 @@
-// const { getOsFileManagerPath, initCustomTraceSubscriber } = require("../index")
-// const path = require("path")
+import { getOsExploreInfo, initCustomTraceSubscriber } from "../index.js"
 
-// init()
+init()
 
-// async function init() {
-//   initCustomTraceSubscriber("./logs")
-//   setTimeout(() => {
-//     const info = getOsFileManagerPath()
-//     console.log(info)
-//   }, 1000)
-// }
+async function init() {
+  initCustomTraceSubscriber("./logs")
+  setTimeout(() => {
+    const info = getOsExploreInfo()
+    console.log(info)
+  }, 1000)
+}
