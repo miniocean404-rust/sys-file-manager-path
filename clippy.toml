@@ -1,0 +1,21 @@
+cognitive-complexity-threshold = 50
+disallowed-names = [
+  "bool",
+  "char",
+  "str",
+  "f32",
+  "f64",
+  "i8",
+  "i16",
+  "i32",
+  "i64",
+  "u8",
+  "u16",
+  "u32",
+  "u64",
+  "isize",
+  "usize",
+]
+# 处理 current MSRV (Minimum Supported Rust Version) is 1.58.0 but this item is stable since 1.64.0 for further information 问题
+msrv = "1.74.0"
+type-complexity-threshold = 25000
