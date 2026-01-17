@@ -68,6 +68,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "backtrace",
+ "explore",
  "napi",
  "napi-build",
  "napi-derive",

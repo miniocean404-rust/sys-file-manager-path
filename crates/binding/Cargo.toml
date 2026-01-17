@@ -13,6 +13,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 # utils = { path = "../../crates/utils" }
+explore.workspace = true
 
 tokio.workspace = true
 anyhow.workspace = true

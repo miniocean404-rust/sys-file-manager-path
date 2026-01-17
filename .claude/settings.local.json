@@ -3,12 +3,13 @@
     "allow": [
       "Bash(cargo build:*)",
       "Bash(cmd /c cargo build:*)",
-      "Bash(Select-String -Pattern \"warning|error\")",
       "Bash(Select-Object -First 20)",
-      "Bash(cmd /c \"cargo build 2>&1\")",
       "Bash(cargo check:*)",
       "Bash(D:/soft-dev/env/rust/cargo/bin/cargo.exe check:*)",
-      "Bash(powershell.exe -Command:*)"
+      "Bash(powershell.exe -Command:*)",
+      "WebFetch(domain:napi.rs)",
+      "mcp__Ref__ref_search_documentation",
+      "mcp__Ref__ref_read_url"
     ]
   }
 }
