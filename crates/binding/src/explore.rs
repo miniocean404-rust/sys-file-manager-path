@@ -2,7 +2,7 @@ use napi::bindgen_prelude::*;
 use napi_derive::napi;
 
 use explore::dto::app_info::Platform as SDKPlatform;
-use explore::export::dir::get_os_file_manager_path;
+use explore::export::dir::get_os_explore_info;
 
 #[napi(string_enum)]
 #[derive(Debug, Default)]
@@ -49,9 +49,9 @@ pub struct AppInfo {
     pub platform: Platform,
 }
 
-#[napi(js_name = "getOsFileManagerPath")]
-pub fn get_os_file_manager_path_node() -> Result<AppInfo> {
-    let info = unsafe { get_os_file_manager_path() }.map_err(|err| {
+#[napi(js_name = "getOsExploreInfo")]
+pub fn get_os_explore_info_binding() -> Result<AppInfo> {
+    let info = unsafe { get_os_explore_info() }.map_err(|err| {
         Error::new(
             Status::GenericFailure,
             format!("获取系统窗口信息失败: {}", err),

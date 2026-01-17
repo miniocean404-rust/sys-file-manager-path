@@ -9,7 +9,11 @@
       "Bash(powershell.exe -Command:*)",
       "WebFetch(domain:napi.rs)",
       "mcp__Ref__ref_search_documentation",
-      "mcp__Ref__ref_read_url"
+      "mcp__Ref__ref_read_url",
+      "Bash(cargo tree:*)",
+      "Bash(for dir in darwin-arm64 darwin-x64 linux-arm-gnueabihf linux-arm64-gnu linux-arm64-musl linux-x64-gnu linux-x64-musl win32-arm64-msvc win32-ia32-msvc win32-x64-msvc)",
+      "Bash(do mkdir -p \"npm/$dir\")",
+      "Bash(done)"
     ]
   }
 }

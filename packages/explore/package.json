@@ -26,12 +26,13 @@
     "access": "public"
   },
   "scripts": {
-    "build:node-dev": "napi build --manifest-path ../../bindings/Cargo.toml --platform -p binding_explore_node --js ./index.js --dts ./index.d.ts --target-dir ../../target -o ./",
-    "build:node": "napi build --manifest-path ../../bindings/Cargo.toml --platform -p binding_explore_node --release -o ./",
+    "build:napi-dev": "napi build --manifest-path ../../Cargo.toml --platform -p binding_explore --js ./index.js --dts ./index.d.ts --target-dir ../../target -o ./",
+    "build:napi": "napi build --manifest-path ../../Cargo.toml --platform -p binding_explore --release -o ./",
     "prepack": "napi prepublish -p ./npm --tag-style npm --no-gh-release",
     "artifacts": "napi artifacts -d ../artifacts --npm-dir ./npm",
     "version": "napi version --npm-dir ./npm",
-    "test:node": "node ./__tests__/index"
+    "test:napi": "node ./__tests__/index",
+    "napi:help": "napi --help"
   },
   "files": [
     "index.js",
@@ -40,8 +41,8 @@
     "LICENSE"
   ],
   "devDependencies": {
-    "@napi-rs/cli": "^3.0.0-alpha.45",
-    "@types/node": "22.3.0",
+    "@napi-rs/cli": "^3.5.1",
+    "@types/node": "25.0.9",
     "npm-run-all": "^4.1.5"
   }
 }
