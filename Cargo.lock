@@ -64,7 +64,7 @@ dependencies = [
 
 [[package]]
 name = "binding_explore"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "backtrace",
@@ -915,7 +915,7 @@ dependencies = [
 
 [[package]]
 name = "sys-file-manager-path"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "cocoa",

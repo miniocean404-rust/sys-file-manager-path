@@ -10,7 +10,7 @@ members = [
 exclude = []
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 authors = ["miniocean404@qq.com"]
 edition = "2024"
 description = "获取 Mac Finder、Windows Explore 窗口的路径"
