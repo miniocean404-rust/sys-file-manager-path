@@ -2,7 +2,7 @@
 
 resolver = "2"
 # 设置默认执行的 workspace
-default-members = ["crates/explore"]
+default-members = ["crates/sys-file-manager-path"]
 members = [
     "crates/*",
     # "crates/xxx",
@@ -11,8 +11,11 @@ exclude = []
 
 [workspace.package]
 version = "0.1.0"
+authors = ["miniocean404@qq.com"]
 edition = "2024"
-repository = ""
+description = "获取 Mac Finder、Windows Explore 窗口的路径"
+license = "MIT"
+repository = "https://github.com/miniocean404-rust/sys-explore"
 
 # [[bin]]
 # name = "core"
@@ -48,7 +51,7 @@ debug-assertions = false
 [workspace.dependencies]
 # 内部 crate
 binding = { path = "./crates/binding" }
-explore = { path = "./crates/explore" }
+sys-file-manager-path = { path = "./crates/sys-file-manager-path" }
 
 # 异步运行时
 tokio = { version = "1.49.0", features = ["full"] }
@@ -62,7 +65,7 @@ chrono = "0.4.42"
 
 # 错误处理
 anyhow = "1.0.100"
-thiserror = "2.0.17"
+thiserror = "2.0.18"
 
 # 文件类型推断
 infer = "0.19.0"

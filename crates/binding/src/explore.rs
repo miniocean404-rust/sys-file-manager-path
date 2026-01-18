@@ -1,8 +1,8 @@
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 
-use explore::dto::app_info::Platform as SDKPlatform;
-use explore::export::dir::get_os_explore_info;
+use sys_file_manager_path::dto::app_info::Platform as SDKPlatform;
+use sys_file_manager_path::export::dir::get_os_explore_info;
 
 #[napi(string_enum)]
 #[derive(Debug, Default)]

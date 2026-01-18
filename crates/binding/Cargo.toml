@@ -1,8 +1,12 @@
 [package]
 name = "binding_explore"
-build = "build.rs"
 version.workspace = true
+authors.workspace = true
 edition.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+build = "build.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
@@ -13,7 +17,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 # utils = { path = "../../crates/utils" }
-explore.workspace = true
+sys-file-manager-path.workspace = true
 
 tokio.workspace = true
 anyhow.workspace = true

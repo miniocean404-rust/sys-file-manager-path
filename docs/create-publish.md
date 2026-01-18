@@ -36,11 +36,11 @@ edition = "2021"
 [package]
 name = "my-awesome-crate"
 version = "0.1.0"
-authors = ["Your Name <you@example.com>"]
+authors = ["miniocean404@qq.com"]
 edition = "2021"
-description = "A short description of my package"
+description = "获取 Mac Finder、Windows Explore 窗口的路径"
 license = "MIT"
-repository = "https://github.com/username/my-awesome-crate"
+repository = "https://github.com/miniocean404-rust/sys-explore"
 ```
 
 ## 3. 发布步骤

@@ -68,11 +68,11 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "backtrace",
- "explore",
  "napi",
  "napi-build",
  "napi-derive",
  "once_cell",
+ "sys-file-manager-path",
  "tokio",
  "tracing",
  "tracing-appender",
@@ -275,21 +275,6 @@ checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "explore"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "cocoa",
- "objc",
- "objc2",
- "strum",
- "strum_macros",
- "tokio",
- "urlencoding",
- "windows",
 ]
 
 [[package]]
@@ -926,6 +911,21 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
+]
+
+[[package]]
+name = "sys-file-manager-path"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "cocoa",
+ "objc",
+ "objc2",
+ "strum",
+ "strum_macros",
+ "tokio",
+ "urlencoding",
+ "windows",
 ]
 
 [[package]]
