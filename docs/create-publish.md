@@ -40,7 +40,7 @@ authors = ["miniocean404@qq.com"]
 edition = "2021"
 description = "获取 Mac Finder、Windows Explore 窗口的路径"
 license = "MIT"
-repository = "https://github.com/miniocean404-rust/sys-explore"
+repository = "https://github.com/miniocean404-rust/sys-file-manager-path"
 ```
 
 ## 3. 发布步骤

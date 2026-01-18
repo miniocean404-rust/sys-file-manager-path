@@ -21,7 +21,9 @@
       "mcp__exa__web_search_exa",
       "mcp__grep__searchGitHub",
       "WebFetch(domain:github.com)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
