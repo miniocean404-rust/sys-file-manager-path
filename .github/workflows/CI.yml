@@ -1,111 +1,164 @@
 name: CI
-# 环境变量配置
+
 env:
+  CI: 1
   DEBUG: napi:*
-  APP_NAME: my-napi-module
-  MACOSX_DEPLOYMENT_TARGET: '10.13'
+  APP_NAME: sys-file-manager-path
+  CARGO_TERM_COLOR: always
+  MACOSX_DEPLOYMENT_TARGET: "10.13"
   CARGO_INCREMENTAL: '1'
+  RUST_LOG: "off"
+
 # 权限配置：允许写入内容和使用 ID token
 permissions:
   contents: write
   id-token: write
-# 触发条件：推送到 main 分支或 PR 时触发
-'on':
+
+on:
   push:
     branches:
-      - main
+      - master
     tags-ignore:
-      - '**'
+      - "**"
     paths-ignore:
-      - '**/*.md'
+      - "**/*.md"
       - LICENSE
-      - '**/*.gitignore'
+      - "**/*.gitignore"
       - .editorconfig
       - docs/**
   pull_request: null
+  merge_group: null
+
 # 并发控制：同一工作流的不同运行会取消之前的运行
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   # ============================================
   # Job 1: 代码检查（Lint）
   # ============================================
   lint:
-    name: Lint
+    name: 代码检查
     runs-on: ubuntu-latest
     steps:
-      # 检出代码
       - uses: actions/checkout@v6
-      # 设置 pnpm 包管理器
-      - name: setup pnpm
+
+      - name: 设置 pnpm
         uses: pnpm/action-setup@v4
-      # 设置 Node.js 环境
-      - name: Setup node
+
+      - name: 设置 Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: pnpm
-      # 安装 Rust 工具链及组件
-      - name: Install
+
+      - name: 安装 Rust 工具链
         uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
-      # 安装 Node.js 依赖
-      - name: Install dependencies
+
+      - name: 安装依赖
         run: pnpm install
-      # 运行 ESLint 检查
-      - name: ESLint
-        run: pnpm lint
-      # 检查 Rust 代码格式
-      - name: Cargo fmt
-        run: cargo fmt -- --check
-      # 运行 Clippy 静态分析
-      - name: Clippy
-        run: cargo clippy
+
+      - name: Cargo 格式化检查
+        run: cargo fmt --all -- --check
+
+      - name: Clippy 静态分析
+        run: cargo clippy --all --all-targets -- -D warnings
+
   # ============================================
-  # Job 2: 多平台构建（Build）
+  # Job 2: 许可证检查 （未知）
+  # ============================================
+  cargo-deny:
+    name: 检查依赖许可证
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'chore:') }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: 安装 Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 安装 cargo-deny
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny@0.14.15
+
+      - name: 检查许可证
+        run: cargo deny check
+
+  # ============================================
+  # Job 3: 多平台构建
   # ============================================
   build:
+    name: 构建 ${{ matrix.settings.target }}
+    runs-on: ${{ matrix.settings.host }}
     strategy:
       fail-fast: false
-      # 矩阵策略：为多个平台构建原生模块
       matrix:
         settings:
+          # macOS
           - host: macos-latest
             target: x86_64-apple-darwin
             build: pnpm build --target x86_64-apple-darwin
-          - host: windows-latest
-            build: pnpm build --target x86_64-pc-windows-msvc
-            target: x86_64-pc-windows-msvc
-          - host: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            build: pnpm build --target x86_64-unknown-linux-gnu --use-napi-cross
+
           - host: macos-latest
             target: aarch64-apple-darwin
             build: pnpm build --target aarch64-apple-darwin
-    name: stable - ${{ matrix.settings.target }} - node@20
-    runs-on: ${{ matrix.settings.host }}
+
+          # Windows
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+            build: pnpm build --target x86_64-pc-windows-msvc
+
+          - host: windows-latest
+            target: i686-pc-windows-msvc
+            build: pnpm build --target i686-pc-windows-msvc
+
+          - host: windows-latest
+            target: aarch64-pc-windows-msvc
+            build: pnpm build --target aarch64-pc-windows-msvc
+
+          # Linux
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            build: pnpm build --target x86_64-unknown-linux-gnu --use-napi-cross
+
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            build: pnpm build --target x86_64-unknown-linux-musl --use-napi-cross
+
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            build: pnpm build --target aarch64-unknown-linux-gnu --use-napi-cross
+
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            build: pnpm build --target aarch64-unknown-linux-musl --use-napi-cross
+
+          - host: ubuntu-latest
+            target: armv7-unknown-linux-gnueabihf
+            build: pnpm build --target armv7-unknown-linux-gnueabihf --use-napi-cross
+
     steps:
-      # 检出代码
       - uses: actions/checkout@v6
-      # 设置 pnpm
-      - name: setup pnpm
+
+      - name: 设置 pnpm
         uses: pnpm/action-setup@v4
-      # 设置 Node.js 环境
-      - name: Setup node
+
+      - name: 设置 Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: pnpm
-      # 安装 Rust 工具链并指定目标平台
-      - name: Install
+
+      - name: 安装 Rust 工具链
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
           targets: ${{ matrix.settings.target }}
-      # 缓存 Cargo 依赖以加速构建
-      - name: Cache cargo
+
+      - name: 缓存 Cargo
         uses: actions/cache@v5
         with:
           path: |
@@ -116,66 +169,67 @@ jobs:
             .cargo-cache
             target/
           key: ${{ matrix.settings.target }}-cargo-${{ matrix.settings.host }}
-      # 为 musl 目标设置 Zig 编译器
-      - uses: mlugg/setup-zig@v2
+
+      - name: 设置 Zig（musl 目标）
         if: ${{ contains(matrix.settings.target, 'musl') }}
+        uses: mlugg/setup-zig@v2
         with:
           version: 0.15.2
-      # 为 musl 目标安装 cargo-zigbuild
-      - name: Install cargo-zigbuild
-        uses: taiki-e/install-action@v2
+
+      - name: 安装 cargo-zigbuild（musl 目标）
         if: ${{ contains(matrix.settings.target, 'musl') }}
+        uses: taiki-e/install-action@v2
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           tool: cargo-zigbuild
+
       # 执行自定义工具链设置（如果配置了）
       - name: Setup toolchain
         run: ${{ matrix.settings.setup }}
         if: ${{ matrix.settings.setup }}
         shell: bash
-      # 安装 Node.js 依赖
-      - name: Install dependencies
+
+      - name: 安装 pnpm 依赖
         run: pnpm install
-      # 为 32 位 Windows 设置 x86 架构的 Node.js
-      - name: Setup node x86
-        uses: actions/setup-node@v6
+
+      - name: 设置 Node.js x86（32 位 Windows）
         if: matrix.settings.target == 'i686-pc-windows-msvc'
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: pnpm
           architecture: x86
-      # 执行构建命令
-      - name: Build
+
+      - name: 构建
         run: ${{ matrix.settings.build }}
         shell: bash
-      # 上传构建产物（.node 文件）
-      - name: Upload artifact
+
+      - name: 上传 Node.js 构建产物
         uses: actions/upload-artifact@v6
-        if: matrix.settings.target != 'wasm32-wasip1-threads'
         with:
           name: bindings-${{ matrix.settings.target }}
-          path: '*.node'
+          path: "*.node"
           if-no-files-found: error
+
       # 上传 WASM 构建产物（.wasm 文件）
-      - name: Upload artifact
-        uses: actions/upload-artifact@v6
-        if: matrix.settings.target == 'wasm32-wasip1-threads'
-        with:
-          name: bindings-${{ matrix.settings.target }}
-          path: '*.wasm'
-          if-no-files-found: error
+      # - name: 上传 WASM 构建产物
+      #   uses: actions/upload-artifact@v6
+      #   if: matrix.settings.target == 'wasm32-wasip1-threads'
+      #   with:
+      #     name: bindings-${{ matrix.settings.target }}
+      #     path: '*.wasm'
+      #     if-no-files-found: error
   # ============================================
-  # Job 3: macOS 和 Windows 绑定测试
+  # Job 4: macOS 和 Windows 测试
   # ============================================
   test-macOS-windows-binding:
-    name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
-    # 依赖构建任务完成
+    name: 测试 ${{ matrix.settings.target }} - node@${{ matrix.node }}
     needs:
       - build
+    runs-on: ${{ matrix.settings.host }}
     strategy:
       fail-fast: false
-      # 矩阵策略：在多个平台和 Node.js 版本上测试
       matrix:
         settings:
           - host: windows-latest
@@ -188,71 +242,66 @@ jobs:
             target: aarch64-apple-darwin
             architecture: arm64
         node:
-          - '20'
-          - '22'
-    runs-on: ${{ matrix.settings.host }}
+          - "20"
+          - "22"
     steps:
-      # 检出代码
       - uses: actions/checkout@v6
-      # 设置 pnpm
-      - name: setup pnpm
+
+      - name: 设置 pnpm
         uses: pnpm/action-setup@v4
-      # 设置指定版本和架构的 Node.js
-      - name: Setup node
+
+      - name: 设置 Node.js
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
           cache: pnpm
           architecture: ${{ matrix.settings.architecture }}
-      # 安装依赖
-      - name: Install dependencies
+
+      - name: 安装依赖
         run: pnpm install
-      # 下载对应平台的构建产物
-      - name: Download artifacts
+
+      - name: 下载构建产物
         uses: actions/download-artifact@v7
         with:
           name: bindings-${{ matrix.settings.target }}
           path: .
-      # 列出文件以验证产物
-      - name: List packages
+
+      - name: 列出文件
         run: ls -R .
         shell: bash
-      # 运行测试
-      - name: Test bindings
+
+      - name: 运行测试
         run: pnpm test
+
   # ============================================
-  # Job 4: Linux 绑定测试
+  # Job 5: Linux 测试
   # ============================================
   test-linux-binding:
-    name: Test ${{ matrix.target }} - node@${{ matrix.node }}
-    # 依赖构建任务完成
-    needs:
-      - build
+    name: 测试 ${{ matrix.target }} - node@${{ matrix.node }}
+    needs: build
+    runs-on: ${{ contains(matrix.target, 'aarch64') && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
-      # 矩阵策略：在不同 Linux 架构和 Node.js 版本上测试
       matrix:
         target:
           - x86_64-unknown-linux-gnu
+          - x86_64-unknown-linux-musl
         node:
-          - '20'
-          - '22'
-    # 根据目标架构选择运行器
-    runs-on: ${{ contains(matrix.target, 'aarch64') && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+          - "20"
+          - "22"
     steps:
-      # 检出代码
       - uses: actions/checkout@v6
-      # 设置 pnpm
-      - name: setup pnpm
+
+      - name: 设置 pnpm
         uses: pnpm/action-setup@v4
-      # 设置 Node.js
-      - name: Setup node
+
+      - name: 设置 Node.js
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
           cache: pnpm
-      # 根据目标平台生成 Docker 参数
-      - name: Output docker params
+
+      - name: 生成 Docker 参数
         id: docker
         run: |
           node -e "
@@ -272,78 +321,81 @@ jobs:
             }
           " >> $GITHUB_OUTPUT
           echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-      # 安装依赖（强制重新安装）
-      - name: Install dependencies
+
+      - name: 安装依赖
         run: pnpm install --force
-      # 下载对应平台的构建产物
-      - name: Download artifacts
+
+      - name: 下载构建产物
         uses: actions/download-artifact@v7
         with:
           name: bindings-${{ matrix.target }}
           path: .
-      # 列出文件以验证产物
-      - name: List packages
+
+      - name: 列出文件
         run: ls -R .
         shell: bash
-      # 为 ARM v7 架构设置 QEMU 模拟器
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+
+      # 为 ARM v7 架构设置 QEMU 模拟器（未知）
+      - name: 设置 QEMU（ARM v7）
         if: ${{ contains(matrix.target, 'armv7') }}
+        uses: docker/setup-qemu-action@v3
         with:
           platforms: all
+
       # 启用 QEMU 用户态模拟
-      - run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - name: 启用 QEMU 用户态模拟（ARM v7）
         if: ${{ contains(matrix.target, 'armv7') }}
-      # 在 Docker 容器中运行测试
-      - name: Test bindings
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+      - name: 在 Docker 中运行测试
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ steps.docker.outputs.IMAGE }}
           options: '-v ${{ steps.docker.outputs.PNPM_STORE_PATH }}:${{ steps.docker.outputs.PNPM_STORE_PATH }} -v ${{ github.workspace }}:${{ github.workspace }} -w ${{ github.workspace }} --platform ${{ steps.docker.outputs.PLATFORM }}'
           run: npm run test
+
   # ============================================
-  # Job 5: 发布到 npm
+  # Job 6: 发布到 npm
   # ============================================
   publish:
-    name: Publish
+    name: 发布到 npm
     runs-on: ubuntu-latest
-    # 依赖所有测试任务完成
     needs:
       - lint
+      - cargo-deny
       - test-macOS-windows-binding
       - test-linux-binding
     steps:
-      # 检出代码
       - uses: actions/checkout@v6
-      # 设置 pnpm
-      - name: setup pnpm
+
+      - name: 设置 pnpm
         uses: pnpm/action-setup@v4
-      # 设置 Node.js
-      - name: Setup node
+
+      - name: 设置 Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: pnpm
-      # 安装依赖
-      - name: Install dependencies
+
+      - name: 安装依赖
         run: pnpm install
-      # 下载所有平台的构建产物
-      - name: Download all artifacts
+
+      - name: 下载所有构建产物
         uses: actions/download-artifact@v7
         with:
           path: artifacts
-      # 创建 npm 目录结构
-      - name: create npm dirs
+
+      - name: 创建 npm 目录
         run: pnpm napi create-npm-dirs
-      # 移动构建产物到对应的 npm 目录
-      - name: Move artifacts
+
+      - name: 移动构建产物
         run: pnpm artifacts
-      # 列出 npm 目录内容以验证
-      - name: List packages
+
+      - name: 列出 npm 目录
         run: ls -R ./npm
         shell: bash
-      # 发布到 npm（根据 commit message 判断版本类型）
-      - name: Publish
+
+      - name: 发布到 npm
         run: |
           npm config set provenance true
           if git log -1 --pretty=%B | grep "^v\?[0-9]\+\.[0-9]\+\.[0-9]\+$";
@@ -355,7 +407,7 @@ jobs:
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             npm publish --tag next --access public
           else
-            echo "Not a release, skipping publish"
+            echo "不是发布版本，跳过发布"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
